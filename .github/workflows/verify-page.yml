@@ -1,0 +1,27 @@
+name: Verify static page
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'index.html'
+      - 'js/**'
+      - '.github/workflows/verify-page.yml'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Start simple HTTP server
+        run: |
+          python3 -m http.server 8000 >/tmp/server.log 2>&1 &
+          sleep 2
+
+      - name: Verify page
+        run: |
+          set -euo pipefail
+          RESPONSE=$(curl -fsS http://localhost:8000/)
+          echo "$RESPONSE" | grep -F "Hello from VerityLab 🧪"
